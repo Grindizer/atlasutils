@@ -1,9 +1,11 @@
 #!/usr/bin/env python
 # -*- encoding: utf-8 -*-
 
-import click, os
+import click
+import os
 import registries
-from builders import GitBuilder
+import atlasutils
+
 
 @click.group()
 def main():
@@ -18,16 +20,13 @@ def main():
 @click.option('-n', '--name', required=True, type=click.STRING, help=u"Name of the docker repository to publish to")
 @click.option('-r', '--region', required=True, default='us-east-1',
                    help=u"ecr region name")
-@click.option('-f', '--force', required=True, default=False, help=u"Create the repository if it does not exist.")
 @click.option('-t', '--tag', required=False, default=None, help=u"tag")
-def publish_ecr(source, name, region, force, tag=None):
+@click.option('-f', '--force', required=True, default=False, help=u"Create the repository if it does not exist.")
+def publish_ecr(source, name, region, tag, force):
     click.secho("/\\tlas <~> 'publish_ecr'", fg='green')
     # setup log function.
     registries.log = click.secho
-
-    builder = GitBuilder(source)
-    registry = registries.ECRRegistry(builder, region)
-    registry.publish(source, name, tag)
+    atlasutils.publish_ecr(source, name, region, tag, force)
 
 if __name__ == '__main__':
     main()

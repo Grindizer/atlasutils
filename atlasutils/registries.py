@@ -83,9 +83,10 @@ class ECRRegistry(IRegistry):
 
         return image_id
 
-    def publish(self, repo_dir, repo_name, forced_tag=None):
+    def publish(self, repo_dir, repo_name, forced_tag=None, create_repo=False):
         tag = forced_tag if forced_tag else self.builder.get_tag()
         log("Tag value: {0}".format(tag))
+
         image_id = self.build(repo_dir, repo_name, tag)
         if not image_id:
             return
@@ -94,6 +95,10 @@ class ECRRegistry(IRegistry):
         self.docker_client.tag(image_id, full_name, tag, True)
 
         self.login()
+        if create_repo:
+            # TODO: add ability to create the repo on ecr if we have the right.
+            pass
+
         log('Pushing images {0}:{1}'.format(full_name, tag))
         result = self.docker_client.push(full_name, tag, stream=True)
         # factorize, in output log function.
