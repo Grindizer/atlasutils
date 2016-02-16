@@ -5,7 +5,7 @@
 import registries
 from builders import GitBuilder
 
-def publish_ecr(source, name, region, force, tag=None):
+def publish_ecr(source, name, region, tag, force):
 
     builder = GitBuilder(source)
     registry = registries.ECRRegistry(builder, region)

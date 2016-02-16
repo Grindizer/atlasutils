@@ -11,7 +11,6 @@ import atlasutils
 def main():
     pass
 
-
 @main.command()
 @click.option('-s', '--source', required=True,
               default=os.getcwd(),
