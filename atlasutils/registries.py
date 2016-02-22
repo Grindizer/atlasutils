@@ -3,9 +3,8 @@ from botocore.session import get_session
 from base64 import b64decode
 from docker import client, errors
 from docker.utils import kwargs_from_env
-import re
 import sys
-import json
+from utils import log_push, log_build
 
 def log(*arg, **kw):
     return
@@ -69,17 +68,8 @@ class ECRRegistry(IRegistry):
         self.builder.pre_build_hook()
 
         log("Running build for '{0}'".format(name))
-        result = self.docker_client.build(repo_dir, name, quiet=True, forcerm=True, stream=True, decode=True)
-        for message in result:
-            if 'stream' in message:
-                log(message['stream'][:-1])
-                last_message = message['stream'][:-1]
-
-        srch = r'Successfully built ([0-9a-f]+)'
-        match = re.search(srch, last_message)
-        image_id = None
-        if match:
-            image_id = match.group(1)
+        result = self.docker_client.build(repo_dir, name, quiet=False, forcerm=True, stream=True, decode=True)
+        image_id = log_build(result, log)
 
         return image_id
 
@@ -101,22 +91,7 @@ class ECRRegistry(IRegistry):
 
         log('Pushing images {0}:{1}'.format(full_name, tag))
         result = self.docker_client.push(full_name, tag, stream=True)
-        # factorize, in output log function.
-        iter = 0
-        last_message = ""
-        for message in result:
-            message = json.loads(message)
-            if "error" in message:
-                log(message["error"], fg='red')
-                sys.exit(1)
-            else:
-                # can take a moment, so distract the dev ...
-                w = ['|', '/', '-', '\\'][iter % 4]
-                log("\rIn progress: {0}".format(w), nl=False, fg='green')
-                iter += 1
-                last_message = message['status']
-
-        log("\n{0}".format(last_message))
+        log_push(result, log)
 
 
 def get_docker_client():
