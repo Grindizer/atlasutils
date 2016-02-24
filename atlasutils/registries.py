@@ -1,5 +1,6 @@
 
 from botocore.session import get_session
+from botocore.client import Config
 from base64 import b64decode
 from docker import client, errors
 from docker.utils import kwargs_from_env
@@ -34,7 +35,7 @@ class ECRRegistry(IRegistry):
         self.docker_client = get_docker_client()
 
     def _get_registry_info(self):
-        ecr_client = get_session().create_client('ecr', self.region)
+        ecr_client = get_session().create_client('ecr', self.region, config=Config(signature_version='v4'))
         result = ecr_client.get_authorization_token()
         auth = result['authorizationData'][0]
         auth_token = b64decode(auth['authorizationToken']).decode()
