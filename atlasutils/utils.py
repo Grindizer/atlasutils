@@ -26,6 +26,8 @@ def log_build(result, log):
         if 'stream' in message:
             log(message['stream'][:-1])
             last_message = message['stream'][:-1]
+        if 'error' in message:
+            log(message['error'])
 
     srch = r'Successfully built ([0-9a-f]+)'
     match = re.search(srch, last_message)
