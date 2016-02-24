@@ -96,7 +96,9 @@ class ECRRegistry(IRegistry):
 
 def get_docker_client():
     kwargs = kwargs_from_env()
-    kwargs['tls'].assert_hostname = False
+    if 'tls' in kwargs:
+        # TODO, add an option to force tls.
+        kwargs['tls'].assert_hostname = False
     return client.Client(**kwargs)
 
 def get_logger():
