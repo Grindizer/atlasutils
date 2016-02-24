@@ -26,7 +26,8 @@ def publish_ecr(source, name, region, tag, force):
     # TODO: allow source to be a github repo.
     # setup log function.
     registries.log = click.secho
-    atlasutils.publish_ecr(source, name, region, tag, force)
+    image_name = atlasutils.publish_ecr(source, name, region, tag, force)
+    click.secho(image_name)
 
 if __name__ == '__main__':
     main()
