@@ -99,7 +99,7 @@ def get_docker_client():
     if 'tls' in kwargs:
         # TODO, add an option to force tls.
         kwargs['tls'].assert_hostname = False
-    return client.Client(**kwargs)
+    return client.Client(version='auto', **kwargs)
 
 def get_logger():
     return lambda x: x
